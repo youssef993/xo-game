@@ -1,0 +1,28 @@
+<main class="app-shell page-enter">
+  <section class="content centered-content">
+    <app-page-header title="Recherche d’adversaire" />
+
+    <div class="search-radar" aria-label="Recherche en cours">
+      <div class="radar-ring ring-one"></div>
+      <div class="radar-ring ring-two"></div>
+      <div class="radar-center">X O</div>
+    </div>
+
+    <h2>Recherche en cours…</h2>
+    <p class="muted">
+      Nous cherchons un adversaire disponible.
+    </p>
+
+    @if (error()) {
+      <p class="error-message">{{ error() }}</p>
+    }
+
+    <button
+      class="secondary-button"
+      type="button"
+      [disabled]="cancelling()"
+      (click)="cancelSearch()">
+      {{ cancelling() ? 'Annulation…' : 'Annuler' }}
+    </button>
+  </section>
+</main>

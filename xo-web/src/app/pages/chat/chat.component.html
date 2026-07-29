@@ -1,0 +1,20 @@
+<main class="app-shell page-enter">
+  <section class="content chat-content">
+    <app-page-header title="Chat de la partie" />
+
+    <div class="messages">
+      @for (message of messages(); track $index) {
+      <div class="message" [class.my-message]="message.author === 'me'">
+        <span>{{ message.text }}</span>
+        <small>{{ message.time }}</small>
+      </div>
+      }
+    </div>
+
+    <form class="message-form" (ngSubmit)="send()">
+      <input [(ngModel)]="draft" name="draft" placeholder="Écrire un message…" maxlength="300">
+      <button class="send-button" type="submit">➤</button>
+    </form>
+  </section>
+  <app-bottom-nav />
+</main>

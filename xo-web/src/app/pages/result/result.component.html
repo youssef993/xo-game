@@ -1,0 +1,24 @@
+<main class="result-page" [class.loss-theme]="status() === 'loss'">
+  @if (status() === 'win') {
+  <div class="confetti" aria-hidden="true">
+    @for (piece of confettiPieces; track piece) {
+    <span [style.--i]="piece"></span>
+    }
+  </div>
+  }
+
+  <section class="result-card" [class.winner-card]="status() === 'win'" [class.loser-card]="status() === 'loss'">
+    <div class="result-icon">{{ icon() }}</div>
+    <h1>{{ title() }}</h1>
+    <p>{{ subtitle() }}</p>
+
+    <div class="result-avatar">{{ status() === 'loss' ? 'S' : 'YZ' }}</div>
+
+    <div class="points" [class.negative]="status() === 'loss'">
+      {{ points() }}
+    </div>
+
+    <button class="primary-button full-width" routerLink="/matchmaking">Rejouer</button>
+    <button class="secondary-button full-width" routerLink="/home">Retour au menu</button>
+  </section>
+</main>

@@ -1,0 +1,60 @@
+<main class="app-shell page-enter">
+  <section class="content">
+    <app-page-header title="Jeu en cours" />
+
+    @if (loading()) {
+      <p class="turn-text">Chargement de la partie…</p>
+    } @else if (game(); as currentGame) {
+      <div class="match-header">
+        <div><strong>{{ currentGame.playerOId ?? 'En attente…' }}</strong><span class="symbol o">O</span></div>
+        <span class="match-vs">VS</span>
+        <div><span class="symbol x">X</span><strong>{{ currentGame.playerXId }}</strong></div>
+      </div>
+
+      @if (waiting()) {
+        <div class="waiting-card">
+          <p>La partie attend un deuxième joueur.</p>
+          <small>ID : {{ currentGame.id }}</small>
+          <button class="secondary-button" type="button" (click)="copyGameId()">Copier l’identifiant</button>
+        </div>
+      }
+
+      <div class="board" aria-label="Plateau de jeu">
+        @for (cell of board(); track $index) {
+          <button
+            class="cell"
+            type="button"
+            [class.cell-x]="cell === 'X'"
+            [class.cell-o]="cell === 'O'"
+            [disabled]="cell !== null || !isMyTurn() || actionPending() || finished()"
+            (click)="play($index)">
+            {{ cell }}
+          </button>
+        }
+      </div>
+
+      <p class="turn-text">
+        @if (waiting()) {
+          Recherche d’un adversaire…
+        } @else if (!finished()) {
+          @if (isMyTurn()) {
+            À toi de jouer ({{ mySymbol() }})
+          } @else {
+            Tour de {{ currentPlayer() }}
+          }
+        } @else {
+          Partie terminée
+        }
+      </p>
+
+      @if (error()) {
+        <p class="error-message">{{ error() }}</p>
+      }
+
+      <div class="game-actions">
+        <button class="secondary-button" routerLink="/chat">Ouvrir le chat</button>
+        <button class="danger-button" type="button" [disabled]="actionPending() || finished()" (click)="abandon()">Abandonner</button>
+      </div>
+    }
+  </section>
+</main>

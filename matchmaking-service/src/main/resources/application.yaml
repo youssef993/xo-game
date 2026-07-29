@@ -1,0 +1,56 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: matchmaking-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/xo-realm}
+
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/xo-realm}
+
+        registration:
+          game-service-client:
+            provider: keycloak
+            client-id: ${MATCHMAKING_CLIENT_ID:matchmaking-service}
+            client-secret: ${MATCHMAKING_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            scope:
+              - openid
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2s
+
+services:
+  game:
+    base-url: ${GAME_SERVICE_URL:http://localhost:8082}
+
+matchmaking:
+  ticket-ttl: 2m
+  matched-ticket-ttl: 1m
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when-authorized

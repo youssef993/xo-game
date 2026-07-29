@@ -1,0 +1,28 @@
+<main class="app-shell page-enter">
+  <section class="content">
+    <app-page-header title="Classement" />
+
+    <div class="tabs">
+      <button class="active-tab">Global</button>
+      <button>Amis</button>
+    </div>
+
+    <div class="podium">
+      <article><span>🥈</span><div class="avatar pink-avatar">S</div><strong>Sarah_23</strong><small>2280</small></article>
+      <article class="first"><span>👑</span><div class="avatar">YZ</div><strong>Youssef</strong><small>2350</small></article>
+      <article><span>🥉</span><div class="avatar orange-avatar">T</div><strong>Thomas_44</strong><small>2150</small></article>
+    </div>
+
+    <div class="ranking-list">
+      @for (player of players; track player.name) {
+      <div class="ranking-row">
+        <strong>{{ player.rank }}</strong>
+        <div class="avatar tiny-avatar">{{ player.name.charAt(0) }}</div>
+        <span>{{ player.name }}</span>
+        <strong>{{ player.points }}</strong>
+      </div>
+      }
+    </div>
+  </section>
+  <app-bottom-nav />
+</main>

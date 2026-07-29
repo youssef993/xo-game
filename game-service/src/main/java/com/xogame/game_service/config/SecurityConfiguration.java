@@ -1,0 +1,94 @@
+package com.xogame.game_service.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableMethodSecurity
+public class SecurityConfiguration {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(
+            HttpSecurity http
+    ) throws Exception {
+
+        return http
+                .csrf(csrf -> csrf.disable())
+
+                .cors(cors -> {})
+
+                .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(
+                                "/actuator/health/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                "/ws/game",
+                                "/ws/game/**"
+                        ).permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/games/**"
+                        ).hasAnyRole(
+                                "PLAYER",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/games/**"
+                        ).hasAnyRole(
+                                "PLAYER",
+                                "ADMIN"
+                        )
+
+                        .requestMatchers(
+                                "/api/admin/**"
+                        ).hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/internal/games/matched"
+                        )
+                        .permitAll()
+
+                        .anyRequest()
+                        .authenticated()
+                )
+
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(
+                                        jwtAuthenticationConverter()
+                                )
+                        )
+                )
+
+                .build();
+    }
+
+    @Bean
+    JwtAuthenticationConverter
+    jwtAuthenticationConverter() {
+
+        JwtAuthenticationConverter converter =
+                new JwtAuthenticationConverter();
+
+        converter.setJwtGrantedAuthoritiesConverter(
+                new KeycloakRealmRoleConverter()
+        );
+
+        converter.setPrincipalClaimName(
+                "preferred_username"
+        );
+
+        return converter;
+    }
+}

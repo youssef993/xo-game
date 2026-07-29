@@ -1,0 +1,24 @@
+<main class="app-shell page-enter">
+  <section class="content">
+    <app-page-header title="Historique" />
+
+    <div class="history-list">
+      @for (match of matches; track match.opponent + match.date) {
+      <article class="history-card">
+        <div class="avatar small-avatar">{{ match.opponent.charAt(0) }}</div>
+        <div>
+          <strong>{{ match.opponent }}</strong>
+          <small>{{ match.date }}</small>
+        </div>
+        <div class="history-result">
+                <span [class.win-text]="match.result === 'Victoire'" [class.loss-text]="match.result === 'Défaite'">
+                  {{ match.result }}
+                </span>
+          <small>{{ match.score }}</small>
+        </div>
+      </article>
+      }
+    </div>
+  </section>
+  <app-bottom-nav />
+</main>
