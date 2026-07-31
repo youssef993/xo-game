@@ -1,5 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { keycloak } from './keycloak';
+import {PlayerApiService} from '../player/player-api.service';
+import {PlayerResponse} from '../player/player.model';
 
 export interface AuthenticatedUser {
   id: string;
@@ -15,9 +17,11 @@ export interface AuthenticatedUser {
 })
 export class AuthService {
 
+  constructor(private readonly playerService: PlayerApiService) {
+  }
   readonly initialized = signal(false);
   readonly authenticated = signal(false);
-  readonly user = signal<AuthenticatedUser | null>(null);
+  readonly user = signal<PlayerResponse | null>(null);
 
   async initialize(): Promise<void> {
     try {
@@ -107,14 +111,11 @@ export class AuthService {
       | { roles?: string[] }
       | undefined;
 
-    this.user.set({
-      id: token.sub,
-      username: token['preferred_username'] as string,
-      email: token['email'] as string | undefined,
-      firstName: token['given_name'] as string | undefined,
-      lastName: token['family_name'] as string | undefined,
-      roles: realmAccess?.roles ?? []
-    });
+    this.playerService.getOrRegisterPlayer().subscribe(res=>{
+      this.user.set(res);
+    },error => {
+      console.error("cant get or register user")
+    })
   }
 
   private installTokenRefresh(): void {

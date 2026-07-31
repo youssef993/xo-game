@@ -6,10 +6,7 @@ import {
 
 import { AuthService } from './auth.service';
 
-export const authGuard: CanActivateFn = async (
-  _route,
-  state
-) => {
+export const authGuard: CanActivateFn = async (_route,state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
 

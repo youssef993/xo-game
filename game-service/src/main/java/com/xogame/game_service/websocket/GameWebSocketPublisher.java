@@ -2,7 +2,6 @@ package com.xogame.game_service.websocket;
 
 import com.xogame.game_service.dto.GameResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 

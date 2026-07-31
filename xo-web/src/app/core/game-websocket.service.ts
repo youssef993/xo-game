@@ -1,17 +1,6 @@
-import {
-  DestroyRef,
-  Injectable,
-  inject,
-  signal
-} from '@angular/core';
-import {
-  Client,
-  Frame,
-  IMessage,
-  StompSubscription
-} from '@stomp/stompjs';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { Client, Frame, IMessage, StompSubscription } from '@stomp/stompjs';
 import { Observable, Subject } from 'rxjs';
-
 import { AuthService } from './auth/auth.service';
 import { GameResponse } from './game/game.models';
 

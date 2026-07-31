@@ -95,8 +95,7 @@ export class GameComponent implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly gameApi: GameApiService,
-    private readonly gameWebSocket:
-      GameWebSocketService,
+    private readonly gameWebSocket: GameWebSocketService,
     readonly auth: AuthService
   ) {}
 
@@ -239,19 +238,14 @@ export class GameComponent implements OnInit, OnDestroy {
         ?.unsubscribe();
 
       this.gameWebSocketSubscription =
-        this.gameWebSocket
-          .watchGame(this.gameId)
-          .subscribe({
+        this.gameWebSocket.watchGame(this.gameId).subscribe({
             next: event => {
               this.handleGameEvent(event);
-            },
-
-            error: error => {
+            }, error: error => {
               console.error(
                 'Erreur abonnement WebSocket',
                 error
               );
-
               this.error.set(
                 'La connexion temps réel a été interrompue.'
               );
@@ -292,11 +286,8 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateGame(
-    game: GameResponse
-  ): void {
+  private updateGame(game: GameResponse): void {
     this.game.set(game);
-
     if (this.isFinishedGame(game)) {
       this.navigateToResult(game);
     }

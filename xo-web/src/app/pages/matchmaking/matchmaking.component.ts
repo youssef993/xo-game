@@ -1,16 +1,8 @@
-import {
-  Component,
-  OnDestroy,
-  OnInit,
-  signal
-} from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription, finalize } from 'rxjs';
-
 import { MatchmakingApiService } from '../../core/matchmaking/matchmaking-api.service';
-import {
-  MatchFoundEvent
-} from '../../core/matchmaking/matchmaking.models';
+import { MatchFoundEvent } from '../../core/matchmaking/matchmaking.models';
 import { MatchmakingWebSocketService } from '../../core/matchmaking/matchmaking-websocket.service';
 import { PageHeaderComponent } from '../../shared/page-header.component';
 
@@ -32,10 +24,8 @@ export class MatchmakingComponent
   private navigatingToGame = false;
 
   constructor(
-    private readonly matchmakingApi:
-      MatchmakingApiService,
-    private readonly matchmakingWebSocket:
-      MatchmakingWebSocketService,
+    private readonly matchmakingApi: MatchmakingApiService,
+    private readonly matchmakingWebSocket: MatchmakingWebSocketService,
     private readonly router: Router
   ) {}
 
