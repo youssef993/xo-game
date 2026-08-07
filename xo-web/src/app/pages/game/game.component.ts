@@ -24,22 +24,15 @@ export class GameComponent implements OnInit, OnDestroy {
   readonly actionPending = signal(false);
   readonly error = signal<string | null>(null);
 
-  readonly webSocketConnected = computed(
-    () => {
+  readonly webSocketConnected = computed(() => {
       this.gameWebSocket.connected();
       this.playerWebSocket.connected();
-      }
-  );
+  });
 
-  readonly board = computed(
-    () =>
-      this.game()?.board ??
-      Array<PlayerSymbol | null>(9).fill(null)
-  );
+  readonly board = computed(() =>this.game()?.board ??Array<PlayerSymbol | null>(9).fill(null));
 
   readonly finished = computed(() => {
     const status = this.game()?.status;
-
     return status
       ? [
           'X_WON',
@@ -50,18 +43,13 @@ export class GameComponent implements OnInit, OnDestroy {
       : false;
   });
 
-  readonly waiting = computed(
-    () =>
-      this.game()?.status ===
-      'WAITING_FOR_PLAYER'
-  );
+  readonly adversairId = signal<string | null>(null)
 
-  readonly currentPlayer = computed(
-    () => this.game()?.currentTurn ?? '-'
-  );
+  readonly waiting = computed(() =>this.game()?.status === 'WAITING_FOR_PLAYER');
 
-  readonly mySymbol =
-    computed<PlayerSymbol | null>(() => {
+  readonly currentPlayer = computed(() => this.game()?.currentTurn ?? '-');
+
+  readonly mySymbol = computed<PlayerSymbol | null>(() => {
       const game = this.game();
       const userId = this.auth.user()?.keycloakId;
 
@@ -70,10 +58,13 @@ export class GameComponent implements OnInit, OnDestroy {
       }
 
       if (game.playerXId === userId) {
+        this.adversairId.set(game.playerOId);
         return 'X';
+
       }
 
       if (game.playerOId === userId) {
+        this.adversairId.set(game.playerXId);
         return 'O';
       }
 
@@ -199,6 +190,10 @@ export class GameComponent implements OnInit, OnDestroy {
     void navigator.clipboard.writeText(
       this.gameId
     );
+  }
+
+  navigateToChat(){
+    this.router.navigate([`/chat/${this.adversairId()}`])
   }
 
   private loadInitialGame(): void {

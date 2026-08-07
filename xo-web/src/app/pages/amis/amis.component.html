@@ -12,8 +12,11 @@
       <div class="ranking-row">
         <div class="avatar tiny-avatar">{{ player.username.charAt(0) }}</div>
         <span>{{ player.username }}</span>
+        @if (listAmis().length !== 0){
         <strong style="text-align:end" (click)="navigateToChat(player.keycloakId)">💬</strong>
-        <strong (click)="addFriend(player.keycloakId)" style="text-align:end">➕</strong>
+        } @else {
+          <strong (click)="addFriend(player.keycloakId)" style="text-align:end">➕</strong>
+        }
       </div>
       }
     </div>

@@ -77,6 +77,12 @@ public class PlayerApplicationService {
         return playerMapper.toResponse(playerRepository.save(player));
     }
 
+    public PlayerResponse getPlayerByKeycloakId(String keycloakId) {
+        return playerMapper.toResponse(
+                playerRepository.findByKeycloakId(keycloakId).get()
+        );
+    }
+
     private String generateUniqueUsername(String preferredUsername,String keycloakId) {
         String base = preferredUsername != null && !preferredUsername.isBlank()
                 ? preferredUsername : "player";
@@ -87,4 +93,5 @@ public class PlayerApplicationService {
 
         return base + "-" + keycloakId.substring(0, 6);
     }
+
 }

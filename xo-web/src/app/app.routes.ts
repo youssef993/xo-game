@@ -38,7 +38,7 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/result/result.component').then(m => m.ResultComponent)
   },
   {
-    path: 'chat',
+    path: 'chat/:userId',
     ...playerAccess,
     loadComponent: () => import('./pages/chat/chat.component').then(m => m.ChatComponent)
   },

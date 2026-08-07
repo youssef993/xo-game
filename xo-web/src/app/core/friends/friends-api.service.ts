@@ -14,11 +14,11 @@ export class FriendsApiService {
     return this.http.get<FriendResponse[]>(`${this.baseUrl}`);
   }
 
-  addFriend(requestedId: string): Observable<any> {
+  addFriend(requestedId: string): Observable<FriendResponse[]> {
     let friends: FriendshipRequest = {
       recieverId: requestedId,
       senderId: ''
     };
-    return this.http.post<any>(`${this.baseUrl}`, friends);
+    return this.http.post<FriendResponse[]>(`${this.baseUrl}`, friends);
   }
 }

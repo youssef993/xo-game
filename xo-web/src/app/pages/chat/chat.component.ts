@@ -1,7 +1,11 @@
-import { Component, signal } from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PageHeaderComponent } from '../../shared/page-header.component';
 import { BottomNavComponent } from '../../shared/bottom-nav.component';
+import {ActivatedRoute} from '@angular/router';
+import {PlayerResponse} from '../../core/player/player.model';
+import {PlayerApiService} from '../../core/player/player-api.service';
+import {Location} from '@angular/common';
 
 interface Message {
   author: 'me' | 'other';
@@ -15,7 +19,23 @@ interface Message {
   imports: [FormsModule, PageHeaderComponent, BottomNavComponent],
   templateUrl: './chat.component.html',
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit {
+
+  userFriend= signal<PlayerResponse | null>(null)
+  constructor(private activatedRoute: ActivatedRoute,
+              private playerService: PlayerApiService,
+              private readonly location: Location) {
+  }
+  ngOnInit(): void {
+    const idDest = this.activatedRoute.snapshot.paramMap.get('userId')
+    idDest === null ? this.location.back() :
+    this.playerService.findPlayersByAuthId(idDest).subscribe(
+      res => {
+        this.userFriend.set(res);
+      }
+    )
+      throw new Error("Method not implemented.");
+  }
   draft = '';
 
   readonly messages = signal<Message[]>([

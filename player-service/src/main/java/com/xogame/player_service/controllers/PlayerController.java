@@ -26,6 +26,13 @@ public class PlayerController {
         return playerApplicationService.getCurrentPlayer(jwt.getSubject());
     }
 
+    @GetMapping("/other/{keycloakId}")
+    public PlayerResponse getOtherPlayer(@AuthenticationPrincipal Jwt jwt,
+                                           @PathVariable String keycloakId){
+        return playerApplicationService.getPlayerByKeycloakId(keycloakId);
+    }
+
+
     @GetMapping
     public List<PlayerResponse> getListPlayers(@RequestParam String search, @AuthenticationPrincipal Jwt jwt){
         return playerApplicationService.getListPlayerByUsernameOrEmail(jwt.getSubject(), search);

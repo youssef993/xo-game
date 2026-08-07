@@ -1,6 +1,6 @@
 <main class="app-shell page-enter">
   <section class="content chat-content">
-    <app-page-header title="Chat de la partie" />
+    <app-page-header title="Chat avec {{userFriend()?.username}}" />
 
     <div class="messages">
       @for (message of messages(); track $index) {

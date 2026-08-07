@@ -4,26 +4,30 @@ import { PageHeaderComponent } from '../../shared/page-header.component';
 import { BottomNavComponent } from '../../shared/bottom-nav.component';
 import {PlayerApiService} from '../../core/player/player-api.service';
 import {FriendsApiService} from '../../core/friends/friends-api.service';
+import {PlayerResponse} from '../../core/player/player.model';
+import {FriendResponse} from '../../core/friends/friends.model';
+import {NgIf} from '@angular/common';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-amis',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent, BottomNavComponent],
+  imports: [FormsModule, PageHeaderComponent, BottomNavComponent, NgIf],
   templateUrl: './amis.component.html',
 })
 export class AmisComponent implements OnInit{
 
   draft = signal('');
 
-  players = signal<any[]>([]);
-  listAmis = signal<any[]>([])
+  players = signal<PlayerResponse[]>([]);
+  listAmis = signal<FriendResponse[]>([])
 
   constructor(private playerService: PlayerApiService,
-    private friendsService: FriendsApiService) {}
+              private friendsService: FriendsApiService,
+              private readonly router: Router) {}
 
   ngOnInit(){
     this.friendsService.getFriends().subscribe(res=>{
-      this.players.set(res)
       this.listAmis.set(res)
     })
 
@@ -31,17 +35,20 @@ export class AmisComponent implements OnInit{
   search(): void {
       const text = this.draft().trim();
       this.playerService.findPlayers(text).subscribe(res=>{
-        this.players.set(res);
-        console.log('players updated')
+        let listIds = new Set(this.listAmis().map(a => a.id))
+        this.players.set(
+          res.filter(p => !listIds.has(p.id))
+        )
+        this.listAmis.set([])
         this.draft.set('');
       });
   }
   addFriend(id: string){
       this.friendsService.addFriend(id).subscribe(res=>{
-          this.players.set(res)
+          this.listAmis.set(res)
       })
   }
   navigateToChat(id: string){
-     console.log('id')
+    this.router.navigate([`/chat/${id}`])
   }
 }

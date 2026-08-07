@@ -52,7 +52,7 @@
       }
 
       <div class="game-actions">
-        <button class="secondary-button" routerLink="/chat">Ouvrir le chat</button>
+        <button class="secondary-button" (click)="navigateToChat()">Ouvrir le chat</button>
         <button class="danger-button" type="button" [disabled]="actionPending() || finished()" (click)="abandon()">Abandonner</button>
       </div>
     }
