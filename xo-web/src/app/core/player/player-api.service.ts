@@ -13,4 +13,8 @@ export class PlayerApiService {
   getOrRegisterPlayer(): Observable<PlayerResponse> {
     return this.http.post<PlayerResponse>(`${this.baseUrl}/me/register`, {});
   }
+
+  findPlayers(search: string): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}?search=${search}`);
+  }
 }

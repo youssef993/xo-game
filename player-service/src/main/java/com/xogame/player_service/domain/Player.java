@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -57,6 +59,27 @@ public class Player {
 
     @Column(nullable = false)
     private int draws;
+
+    @Column(nullable = false)
+    private int meilleurSerie;
+
+    @Column(nullable = false)
+    private int serieActuelle;
+
+    @OneToMany(
+            mappedBy = "requester",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Friendship> sentFriendRequests = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "receiver",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<Friendship> receivedFriendRequests = new ArrayList<>();
+
 
     @Column(name = "created_at",nullable = false,updatable = false)
     private Instant createdAt;

@@ -5,6 +5,7 @@ import { AuthService } from '../../core/auth/auth.service';
 import { GameApiService } from '../../core/game/game-api.service';
 import { ApiProblem, GameResponse, PlayerSymbol } from '../../core/game/game.models';
 import { GameUpdatedEvent, GameWebSocketService } from '../../core/game-websocket.service';
+import { PlayerWebSocketService } from '../../core/player-websocket.service';
 import { PageHeaderComponent } from '../../shared/page-header.component';
 
 @Component({
@@ -24,7 +25,10 @@ export class GameComponent implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
 
   readonly webSocketConnected = computed(
-    () => this.gameWebSocket.connected()
+    () => {
+      this.gameWebSocket.connected();
+      this.playerWebSocket.connected();
+      }
   );
 
   readonly board = computed(
@@ -59,7 +63,7 @@ export class GameComponent implements OnInit, OnDestroy {
   readonly mySymbol =
     computed<PlayerSymbol | null>(() => {
       const game = this.game();
-      const userId = this.auth.user()?.id;
+      const userId = this.auth.user()?.keycloakId;
 
       if (!game || !userId) {
         return null;
@@ -85,17 +89,17 @@ export class GameComponent implements OnInit, OnDestroy {
 
   private gameId = '';
 
-  private gameWebSocketSubscription?:
-    Subscription;
+  private gameWebSocketSubscription?: Subscription;
+  private playerWebSocketSubscription?: Subscription;
 
-  private initialGameSubscription?:
-    Subscription;
+  private initialGameSubscription?:Subscription;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly gameApi: GameApiService,
     private readonly gameWebSocket: GameWebSocketService,
+    private readonly playerWebSocket: PlayerWebSocketService,
     readonly auth: AuthService
   ) {}
 
@@ -116,10 +120,11 @@ export class GameComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.initialGameSubscription?.unsubscribe();
 
-    this.gameWebSocketSubscription
-      ?.unsubscribe();
+    this.gameWebSocketSubscription?.unsubscribe();
+    //this.playerWebSocketSubscription?.unsubscribe();
 
     void this.gameWebSocket.disconnect();
+    //void this.playerWebSocket.disconnect();
   }
 
   play(index: number): void {
@@ -233,9 +238,10 @@ export class GameComponent implements OnInit, OnDestroy {
     Promise<void> {
     try {
       await this.gameWebSocket.connect();
+      await this.playerWebSocket.connect();
 
-      this.gameWebSocketSubscription
-        ?.unsubscribe();
+      this.gameWebSocketSubscription?.unsubscribe();
+      this.playerWebSocketSubscription?.unsubscribe();
 
       this.gameWebSocketSubscription =
         this.gameWebSocket.watchGame(this.gameId).subscribe({
@@ -251,6 +257,20 @@ export class GameComponent implements OnInit, OnDestroy {
               );
             }
           });
+      this.playerWebSocketSubscription =
+        this.playerWebSocket.watchScore().subscribe({
+            next: event => {
+              console.log(event)
+            }, error: error => {
+              console.error(
+                'Erreur abonnement WebSocket',
+                error
+              );
+              this.error.set(
+                'La connexion temps réel a été interrompue.'
+              );
+            }
+        });
     } catch (error) {
       console.error(
         'Connexion WebSocket impossible',
@@ -288,6 +308,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   private updateGame(game: GameResponse): void {
     this.game.set(game);
+    console.log(this.game()?.currentTurn)
     if (this.isFinishedGame(game)) {
       this.navigateToResult(game);
     }
@@ -307,7 +328,7 @@ export class GameComponent implements OnInit, OnDestroy {
   private navigateToResult(
     game: GameResponse
   ): void {
-    const userId = this.auth.user()?.id;
+    const userId = this.auth.user()?.keycloakId;
 
     let result:
       | 'win'

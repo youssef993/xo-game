@@ -5,10 +5,9 @@ import com.xogame.player_service.services.PlayerApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/players")
@@ -25,5 +24,10 @@ public class PlayerController {
     @GetMapping("/me")
     public PlayerResponse getCurrentPlayer(@AuthenticationPrincipal Jwt jwt){
         return playerApplicationService.getCurrentPlayer(jwt.getSubject());
+    }
+
+    @GetMapping
+    public List<PlayerResponse> getListPlayers(@RequestParam String search, @AuthenticationPrincipal Jwt jwt){
+        return playerApplicationService.getListPlayerByUsernameOrEmail(jwt.getSubject(), search);
     }
 }

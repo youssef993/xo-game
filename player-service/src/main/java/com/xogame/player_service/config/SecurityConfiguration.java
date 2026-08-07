@@ -29,8 +29,8 @@ public class SecurityConfiguration {
                         ).permitAll()
 
                         .requestMatchers(
-                                "/ws/game",
-                                "/ws/game/**"
+                                "/ws/player",
+                                "/ws/player/**"
                         ).permitAll()
 
                         .requestMatchers(

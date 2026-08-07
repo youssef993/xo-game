@@ -20,8 +20,7 @@ export class HomeComponent {
   constructor(readonly auth: AuthService) {}
   readonly menuItems: MenuItem[] = [
     { title: 'Jouer maintenant', subtitle: 'Trouver un adversaire aléatoire', icon: '▶', route: '/matchmaking' },
-    { title: 'Inviter un ami', subtitle: 'Créer une partie privée', icon: '♟', route: '/matchmaking' },
-    { title: 'Partie rapide', subtitle: 'Jouer immédiatement', icon: '⚡', route: '/matchmaking' },
+    { title: 'Liste des amis', subtitle: 'Créer une partie privée', icon: '♟', route: '/amis' },
     { title: 'Classement', subtitle: 'Découvrir les meilleurs joueurs', icon: '🏆', route: '/leaderboard' }
   ];
 }

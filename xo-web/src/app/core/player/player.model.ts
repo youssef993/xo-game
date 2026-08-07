@@ -14,5 +14,9 @@ export interface PlayerResponse {
   wins: number;
   losses: number;
   draws: number;
+  score: number;
+  taux: number;
+  meilleurSerie: number;
+  serieActuelle: number;
   createdAt: string;
 }

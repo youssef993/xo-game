@@ -99,7 +99,7 @@ export class AuthService {
     return roles.some(role => this.hasRole(role));
   }
 
-  private loadUserFromToken(): void {
+  public loadUserFromToken(): void {
     const token = keycloak.tokenParsed;
 
     if (!token?.sub) {

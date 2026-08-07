@@ -1,0 +1,22 @@
+<main class="app-shell page-enter">
+  <section class="content">
+    <app-page-header title="Amis" />
+    <form class="message-form" style="    margin-bottom: 32px;
+    height: 38px;" (ngSubmit)="search()">
+      <input [(ngModel)]="draft" name="draft" style="border-radius: 8px;" placeholder="trouver un ami">
+      <button class="send-button" style="border-radius: 4px;" type="submit">🔍</button>
+    </form>
+
+    <div class="ranking-list">
+      @for (player of players(); track player.username) {
+      <div class="ranking-row">
+        <div class="avatar tiny-avatar">{{ player.username.charAt(0) }}</div>
+        <span>{{ player.username }}</span>
+        <strong style="text-align:end" (click)="navigateToChat(player.keycloakId)">💬</strong>
+        <strong (click)="addFriend(player.keycloakId)" style="text-align:end">➕</strong>
+      </div>
+      }
+    </div>
+  </section>
+  <app-bottom-nav />
+</main>

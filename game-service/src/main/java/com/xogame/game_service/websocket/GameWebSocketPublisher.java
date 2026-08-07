@@ -13,20 +13,9 @@ public class GameWebSocketPublisher {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void publish(
-            String eventType,
-            GameResponse game
-    ) {
-        GameUpdatedEvent event = new GameUpdatedEvent(
-                eventType,
-                game.id(),
-                game,
-                Instant.now()
-        );
+    public void publish(String eventType,GameResponse game) {
+        GameUpdatedEvent event = new GameUpdatedEvent(eventType,game.id(),game,Instant.now());
 
-        messagingTemplate.convertAndSend(
-                "/topic/games/" + game.id(),
-                event
-        );
+        messagingTemplate.convertAndSend("/topic/games/" + game.id(),event);
     }
 }

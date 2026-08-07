@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -43,6 +44,14 @@ public class PlayerApplicationService {
                                 "Profil joueur introuvable"
                         )
                 );
+    }
+    @Transactional
+    public List<PlayerResponse> getListPlayerByUsernameOrEmail(
+            String userKeycloakId, String searchString
+    ) {
+        return playerRepository
+                .searchPlayers(userKeycloakId, searchString)
+                .stream().map(playerMapper::toResponse).toList();
     }
 
     private PlayerResponse createPlayer(Jwt jwt) {

@@ -3,24 +3,24 @@
     <app-page-header title="Mon profil" />
 
     <div class="profile-hero">
-      <div class="avatar large-avatar">YZ</div>
-      <h2>Youssef</h2>
+      <div class="avatar large-avatar">{{ (auth.user()?.username ?? 'U').slice(0, 2).toUpperCase() }}</div>
+      <h2>{{ auth.user()?.username ?? 'Joueur' }} </h2>
       <p>Niveau 12</p>
       <div class="progress"><span style="width: 68%"></span></div>
       <small>2350 / 3000 XP</small>
     </div>
 
     <div class="stats-grid">
-      <article><strong>156</strong><span>Parties</span></article>
-      <article><strong class="green">98</strong><span>Victoires</span></article>
-      <article><strong class="red">45</strong><span>Défaites</span></article>
-      <article><strong>13</strong><span>Nuls</span></article>
+      <article><strong>{{ auth.user()?.gamesPlayed ?? '-' }}</strong><span>Parties</span></article>
+      <article><strong class="green">{{ auth.user()?.wins ?? '-' }}</strong><span>Victoires</span></article>
+      <article><strong class="red">{{ auth.user()?.losses ?? '-' }}</strong><span>Défaites</span></article>
+      <article><strong>{{ auth.user()?.draws ?? '-' }}</strong><span>Nuls</span></article>
     </div>
 
     <div class="details-card">
-      <div><span>Taux de victoire</span><strong>62,8 %</strong></div>
-      <div><span>Meilleure série</span><strong>8 victoires</strong></div>
-      <div><span>Série actuelle</span><strong>3 victoires</strong></div>
+      <div><span>Taux de victoire</span><strong>{{ (auth.user()?.taux ?? 0) * 100 }} %</strong></div>
+      <div><span>Meilleure série</span><strong>{{ auth.user()?.meilleurSerie ?? '-' }} victoires</strong></div>
+      <div><span>Série actuelle</span><strong>{{ auth.user()?.serieActuelle ?? '-' }} victoires</strong></div>
     </div>
   </section>
   <app-bottom-nav />

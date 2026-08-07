@@ -1,12 +1,15 @@
 package com.xogame.game_service.controller;
 
 import com.xogame.game_service.dto.CreateMatchedGameRequest;
+import com.xogame.game_service.dto.GameAccessResponse;
 import com.xogame.game_service.dto.GameResponse;
 import com.xogame.game_service.service.GameApplicationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/internal/games")
@@ -25,6 +28,17 @@ public class InternalGameController {
         return gameService.createMatchedGame(
                 request.playerXId(),
                 request.playerOId()
+        );
+    }
+
+    @GetMapping("/{gameId}/players/{playerId}/access")
+    public GameAccessResponse verifyPlayerAccess(
+            @PathVariable UUID gameId,
+            @PathVariable String playerId
+    ) {
+        return gameService.verifyPlayerAccess(
+                gameId,
+                playerId
         );
     }
 }

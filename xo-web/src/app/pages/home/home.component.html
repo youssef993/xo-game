@@ -5,9 +5,9 @@
       <div class="avatar">{{ (auth.user()?.username ?? 'U').slice(0, 2).toUpperCase() }}</div>
       <div>
         <strong>{{ auth.user()?.username ?? 'Joueur' }}</strong>
-        <p>Niveau 12</p>
+        <p>wins: {{ auth.user()?.wins }} | Draws: {{ auth.user()?.draws }} | Losses: {{ auth.user()?.losses }} </p>
       </div>
-      <div class="score">🏆 2350</div>
+      <div class="score">🏆 {{ auth.user()?.score ?? '-' }}</div>
     </div>
 
     <h1>Que veux-tu faire ?</h1>

@@ -22,26 +22,13 @@ public class MatchmakingEventPublisher {
             MatchmakingTicket ticket
     ) {
         MatchFoundEvent event =
-                new MatchFoundEvent(
-                        "MATCH_FOUND",
-                        ticket.getPlayerId(),
-                        ticket.getOpponentId(),
-                        ticket.getGameId(),
-                        Instant.now()
-                );
+                new MatchFoundEvent("MATCH_FOUND", ticket.getPlayerId(),  ticket.getOpponentId(),
+                        ticket.getGameId(), Instant.now());
 
         try {
-            redisTemplate.convertAndSend(
-                    matchmakingTopic.getTopic(),
-                    objectMapper.writeValueAsString(
-                            event
-                    )
-            );
+            redisTemplate.convertAndSend(matchmakingTopic.getTopic(), objectMapper.writeValueAsString(event));
         } catch (Exception exception) {
-            throw new IllegalStateException(
-                    "Impossible de publier MATCH_FOUND",
-                    exception
-            );
+            throw new IllegalStateException("Impossible de publier MATCH_FOUND", exception);
         }
     }
 }

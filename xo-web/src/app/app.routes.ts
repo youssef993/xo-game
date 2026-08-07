@@ -58,6 +58,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
   },
   {
+    path: 'amis',
+    ...playerAccess,
+    loadComponent: () => import('./pages/amis/amis.component').then(m => m.AmisComponent)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] },

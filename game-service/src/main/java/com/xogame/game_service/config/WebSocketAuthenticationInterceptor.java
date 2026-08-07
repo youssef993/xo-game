@@ -32,24 +32,13 @@ public class WebSocketAuthenticationInterceptor
     private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
     @Override
-    public Message<?> preSend(
-            Message<?> message,
-            MessageChannel channel
-    ) {
-        StompHeaderAccessor accessor =
-                MessageHeaderAccessor.getAccessor(
-                        message,
-                        StompHeaderAccessor.class
-                );
+    public Message<?> preSend(Message<?> message,MessageChannel channel) {
+        StompHeaderAccessor accessor =MessageHeaderAccessor.getAccessor(message,StompHeaderAccessor.class);
 
-        if (accessor == null
-                || !StompCommand.CONNECT.equals(accessor.getCommand())) {
+        if (accessor == null || !StompCommand.CONNECT.equals(accessor.getCommand())) {
             return message;
         }
-
-        String authorization =
-                accessor.getFirstNativeHeader(AUTHORIZATION_HEADER);
-
+        String authorization =accessor.getFirstNativeHeader(AUTHORIZATION_HEADER);
         if (!StringUtils.hasText(authorization)
                 || !authorization.startsWith(BEARER_PREFIX)) {
             throw new BadCredentialsException(
@@ -57,9 +46,7 @@ public class WebSocketAuthenticationInterceptor
             );
         }
 
-        String tokenValue = authorization
-                .substring(BEARER_PREFIX.length())
-                .trim();
+        String tokenValue = authorization.substring(BEARER_PREFIX.length()).trim();
 
         if (!StringUtils.hasText(tokenValue)) {
             throw new BadCredentialsException(
@@ -69,22 +56,16 @@ public class WebSocketAuthenticationInterceptor
 
         Jwt jwt = jwtDecoder.decode(tokenValue);
 
-        AbstractAuthenticationToken authentication =
-                jwtAuthenticationConverter.convert(jwt);
+        AbstractAuthenticationToken authentication = jwtAuthenticationConverter.convert(jwt);
 
         if (authentication == null) {
             throw new BadCredentialsException(
                     "Authentification WebSocket invalide"
             );
         }
-
         accessor.setUser(authentication);
 
-        log.info(
-                "Connexion STOMP authentifiée : utilisateur={}, authorities={}",
-                authentication.getName(),
-                authentication.getAuthorities()
-        );
+        log.info("Connexion STOMP authentifiée : utilisateur={}, authorities={}",authentication.getName(), authentication.getAuthorities());
 
         return message;
     }

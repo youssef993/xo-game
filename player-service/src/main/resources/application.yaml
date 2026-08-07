@@ -1,0 +1,61 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: player-service
+
+  kafka:
+    bootstrap-servers: localhost:9094
+
+    consumer:
+      group-id: xogame-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.xogame.*"
+        spring.json.value.default.type: "com.xogame.player_service.dto.kafka.ScoreEvent"
+
+    listener:
+      ack-mode: RECORD
+      concurrency: 3
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/player_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8080/realms/xo-realm}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - info
+          - metrics
+
+  health:
+    probes:
+      enabled: true
+
+logging:
+  level:
+    com.xogame.player_service: DEBUG
+
+kafka:
+  topics:
+    games: games-topic

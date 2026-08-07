@@ -11,15 +11,8 @@ public class GameStateChangedListener {
 
     private final GameWebSocketPublisher webSocketPublisher;
 
-    @TransactionalEventListener(
-            phase = TransactionPhase.AFTER_COMMIT
-    )
-    public void onGameStateChanged(
-            GameStateChangedEvent event
-    ) {
-        webSocketPublisher.publish(
-                event.eventType(),
-                event.game()
-        );
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void onGameStateChanged(GameStateChangedEvent event) {
+        webSocketPublisher.publish(event.eventType(),event.game());
     }
 }

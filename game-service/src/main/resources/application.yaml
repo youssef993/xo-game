@@ -9,6 +9,16 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/game_db}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:admin}
+  kafka:
+    bootstrap-servers: localhost:9094
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      properties:
+        spring.json.add.type.headers: false
+      acks: all
+      retries: 3
 
   jpa:
     open-in-view: false
@@ -42,3 +52,6 @@ logging:
   level:
     com.xogame.game_service: DEBUG
 
+kafka:
+  topics:
+    games: games-topic

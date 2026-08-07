@@ -16,6 +16,10 @@ public record PlayerResponse(
         int wins,
         int losses,
         int draws,
+        long score,
+        long meilleurSerie,
+        long serieActuelle,
+        double taux,
         Instant createdAt
 ) {
 }

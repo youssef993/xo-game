@@ -4,8 +4,10 @@ import com.xogame.game_service.domain.entities.Game;
 import com.xogame.game_service.domain.entities.GameMove;
 import com.xogame.game_service.domain.enums.GameStatus;
 import com.xogame.game_service.domain.enums.PlayerSymbol;
+import com.xogame.game_service.dto.GameAccessResponse;
 import com.xogame.game_service.dto.GameResponse;
 import com.xogame.game_service.dto.PlayMoveRequest;
+import com.xogame.game_service.dto.kafka.ScoreEvent;
 import com.xogame.game_service.exception.GameNotFoundException;
 import com.xogame.game_service.exception.InvalidGameActionException;
 import com.xogame.game_service.mapper.GameMapper;
@@ -29,6 +31,7 @@ public class GameApplicationService {
     private final BoardCalculator boardCalculator;
     private final GameMapper gameMapper;
     private final ApplicationEventPublisher eventPublisher;
+    private final GamesProducer gamesProducer;
 
     @Transactional
     public GameResponse createGame(String playerId) {
@@ -114,10 +117,7 @@ public class GameApplicationService {
         List<PlayerSymbol> board =
                 boardCalculator.buildBoard(game.getMoves());
 
-        if (boardCalculator.isCellOccupied(
-                board,
-                request.cellIndex()
-        )) {
+        if (boardCalculator.isCellOccupied(board,request.cellIndex())) {
             throw new InvalidGameActionException(
                     "Cette case est déjà occupée"
             );
@@ -135,17 +135,17 @@ public class GameApplicationService {
         game.addMove(move);
         board.set(request.cellIndex(), playerSymbol);
 
-        updateGameStateAfterMove(
-                game,
-                board,
-                playerSymbol,
-                playerId
-        );
+        updateGameStateAfterMove(game, board, playerSymbol, playerId);
 
-        String eventType =
-                game.getStatus().isFinished()
-                        ? GameEventType.GAME_FINISHED
-                        : GameEventType.MOVE_PLAYED;
+        boolean isGameFinished = game.getStatus().isFinished();
+        String eventType = isGameFinished? GameEventType.GAME_FINISHED : GameEventType.MOVE_PLAYED;
+
+        if (isGameFinished){
+            saveResultUsingKafka(new ScoreEvent(game.getPlayerXId(),
+                    game.getPlayerOId(),
+                    game.getWinnerId()
+                    ));
+        }
 
         return saveAndPublish(game, eventType);
     }
@@ -163,24 +163,22 @@ public class GameApplicationService {
             );
         }
 
-        PlayerSymbol playerSymbol =
-                resolvePlayerSymbol(game, playerId);
+        PlayerSymbol playerSymbol = resolvePlayerSymbol(game, playerId);
 
         game.setStatus(GameStatus.ABANDONED);
 
-        String opponentId =
-                playerSymbol == PlayerSymbol.X
-                        ? game.getPlayerOId()
-                        : game.getPlayerXId();
+        String opponentId = playerSymbol == PlayerSymbol.X ? game.getPlayerOId() : game.getPlayerXId();
 
         game.setWinnerId(opponentId);
         game.setCurrentTurn(null);
         game.setFinishedAt(Instant.now());
 
-        return saveAndPublish(
-                game,
-                GameEventType.GAME_ABANDONED
-        );
+        saveResultUsingKafka(new ScoreEvent(game.getPlayerXId(),
+                game.getPlayerOId(),
+                game.getWinnerId()
+        ));
+
+        return saveAndPublish(game, GameEventType.GAME_ABANDONED);
     }
 
     @Transactional
@@ -210,6 +208,27 @@ public class GameApplicationService {
                 game,
                 GameEventType.GAME_CREATED
         );
+    }
+
+    @Transactional(readOnly = true)
+    public GameAccessResponse verifyPlayerAccess(
+            UUID gameId,
+            String playerId
+    ) {
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameNotFoundException(gameId));
+
+        boolean allowed = playerId != null &&
+                        (playerId.equals(game.getPlayerXId()) || playerId.equals(game.getPlayerOId()));
+
+        return new GameAccessResponse(gameId, playerId, allowed);
+    }
+
+    private void saveResultUsingKafka(ScoreEvent scoreEvent){
+        Thread kafkaThread = new Thread(()->{
+            gamesProducer.sendEvent(scoreEvent);
+        });
+        kafkaThread.start();
     }
 
     private Game getGameForUpdate(UUID gameId) {
