@@ -6,6 +6,8 @@ import {ActivatedRoute} from '@angular/router';
 import {PlayerResponse} from '../../core/player/player.model';
 import {PlayerApiService} from '../../core/player/player-api.service';
 import {Location} from '@angular/common';
+import {ChatApiService} from '../../core/chat/chat-api.service';
+import {MessageResponse} from '../../core/chat/chat.model';
 
 interface Message {
   author: 'me' | 'other';
@@ -22,27 +24,35 @@ interface Message {
 export class ChatComponent implements OnInit {
 
   userFriend= signal<PlayerResponse | null>(null)
+  messages = signal<MessageResponse[]>([]);
+
   constructor(private activatedRoute: ActivatedRoute,
               private playerService: PlayerApiService,
+              private chatService: ChatApiService,
               private readonly location: Location) {
   }
+
   ngOnInit(): void {
     const idDest = this.activatedRoute.snapshot.paramMap.get('userId')
     idDest === null ? this.location.back() :
     this.playerService.findPlayersByAuthId(idDest).subscribe(
       res => {
         this.userFriend.set(res);
+        this.chatService.getOrCreateConversation(idDest).subscribe(
+          conversation=>{
+            this.chatService.getMessages(conversation.id).subscribe(
+              msgs =>{
+                this.messages.set(msgs);
+              }
+            )
+          }
+        )
       }
     )
-      throw new Error("Method not implemented.");
   }
   draft = '';
 
-  readonly messages = signal<Message[]>([
-    { author: 'other', text: 'Bonne chance ! 🙂', time: '14:32' },
-    { author: 'me', text: 'Merci, à toi aussi !', time: '14:32' },
-    { author: 'other', text: 'Beau coup !', time: '14:34' }
-  ]);
+
 
   send(): void {
     const text = this.draft.trim();
@@ -50,7 +60,7 @@ export class ChatComponent implements OnInit {
 
     this.messages.update(messages => [
       ...messages,
-      { author: 'me', text, time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) }
+      //{ author: 'me', text, time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) }
     ]);
     this.draft = '';
   }

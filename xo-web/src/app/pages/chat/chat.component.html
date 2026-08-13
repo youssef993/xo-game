@@ -4,9 +4,9 @@
 
     <div class="messages">
       @for (message of messages(); track $index) {
-      <div class="message" [class.my-message]="message.author === 'me'">
-        <span>{{ message.text }}</span>
-        <small>{{ message.time }}</small>
+      <div class="message" [class.my-message]="message.senderId === 'me'">
+        <span>{{ message.content }}</span>
+        <small>{{ message.editedAt }}</small>
       </div>
       }
     </div>
